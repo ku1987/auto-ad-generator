@@ -7,7 +7,7 @@ export class OpenAI {
     this.openai = new OpenAIApi(new Configuration({ apiKey }));
   }
 
-  async generateText(prompt: string, model = "gpt-4") {
+  async generateText(prompt: string, model = "gpt-3.5-turbo") {
     try {
       const response = await this.openai.createChatCompletion({
         model,
@@ -17,6 +17,20 @@ export class OpenAI {
         `request cost: ${response?.data?.usage?.total_tokens} tokens`
       );
       return response.data.choices[0].message?.content;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async generateImage(prompt: string) {
+    try {
+      const response = await this.openai.createImage({
+        prompt,
+        n: 3,
+      });
+      console.log(response?.data?.data);
+      return response?.data?.data;
     } catch (error) {
       console.error(error);
       throw error;

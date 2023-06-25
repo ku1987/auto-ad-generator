@@ -1,8 +1,11 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import "/styles/globals.css";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+import { ThemeProvider } from "@material-tailwind/react";
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <ThemeProvider>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
 }
-
-export default MyApp

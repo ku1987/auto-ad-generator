@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { OpenAI } from "../lib/apis/openai";
 
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
@@ -6,23 +7,23 @@ const IndexPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ env: process.env.openAiApiKey });
+    if (!prompt) {
+      alert("Please enter a valid prompt.");
+      setResponse("");
+      return;
+    }
 
     try {
-      const res = await fetch("https://jsonplaceholder.typicode.com/todos/1", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // body: JSON.stringify({ prompt }),
-      });
-
-      const data = await res.json();
-      console.log(data);
-
-      setResponse(data.title);
+      const openai = new OpenAI("process.env.openAiApiKey as string");
+      const res = await openai.generateText(prompt);
+      if (!res) {
+        console.warn("Nothing returned from OpenAI API.");
+        return;
+      }
+      setResponse(res);
     } catch (error) {
       console.error("Error:", error);
+      throw error;
     }
   };
 
@@ -30,13 +31,9 @@ const IndexPage = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">Title</h1>
       <form onSubmit={handleSubmit} className="mb-4">
-        <label className="block mb-2">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
           Prompt:
-          <input
-            type="text"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Write your thoughts here..."></textarea>
           />
         </label>
         <button

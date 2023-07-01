@@ -1,11 +1,11 @@
-import "/styles/globals.css";
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import RootLayout from "../app/layout";
 
-import { ThemeProvider } from "@material-tailwind/react";
-
-export default function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider>
-      <Component {...pageProps} />
-    </ThemeProvider>
+    <RootLayout>
+      <Component {...pageProps} />;
+    </RootLayout>
   );
 }

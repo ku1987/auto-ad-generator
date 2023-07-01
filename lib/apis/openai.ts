@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
+import { CREATE_IMAGE_NUM, OPEN_AI_TEXT_MODEL } from "./const";
 
 export class OpenAI {
   openai: OpenAIApi;
@@ -7,7 +8,7 @@ export class OpenAI {
     this.openai = new OpenAIApi(new Configuration({ apiKey }));
   }
 
-  async generateText(prompt: string, model = "gpt-3.5-turbo") {
+  async generateText(prompt: string, model = OPEN_AI_TEXT_MODEL) {
     try {
       const response = await this.openai.createChatCompletion({
         model,
@@ -27,7 +28,7 @@ export class OpenAI {
     try {
       const response = await this.openai.createImage({
         prompt,
-        n: 3,
+        n: CREATE_IMAGE_NUM,
       });
       console.log(response?.data?.data);
       return response?.data?.data;

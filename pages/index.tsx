@@ -1,185 +1,62 @@
-"use client";
+import { LinkText } from "../components/link-text";
 
-import { useState } from "react";
-import Image from "next/image";
-import { ImagesResponseDataInner } from "openai";
-
-import { OpenAI } from "../lib/apis/openai";
-import { Loader } from "../lib/components/spinner";
-import { OPEN_AI_API_KEY } from "../lib/apis/const";
-
-const images = [
-  {
-    url: "https://oaidalleapiprodscus.blob.core.windows.net/private/org-OtyVjKo51CJ3Rwe2kOSDQ7B6/user-W3tfT5w8vZ5ZNUzvLdNkph6z/img-GJGqsPxcMzDTOS6lGx1kb7H7.png?st=2023-07-01T05%3A05%3A08Z&se=2023-07-01T07%3A05%3A08Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-06-30T20%3A28%3A01Z&ske=2023-07-01T20%3A28%3A01Z&sks=b&skv=2021-08-06&sig=WwXa%2B0h9zngW3gIqRp6dxzx8ILDy5Phnvqk5WDtcq1I%3D",
-  },
-  {
-    url: "https://oaidalleapiprodscus.blob.core.windows.net/private/org-OtyVjKo51CJ3Rwe2kOSDQ7B6/user-W3tfT5w8vZ5ZNUzvLdNkph6z/img-GJGqsPxcMzDTOS6lGx1kb7H7.png?st=2023-07-01T05%3A05%3A08Z&se=2023-07-01T07%3A05%3A08Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-06-30T20%3A28%3A01Z&ske=2023-07-01T20%3A28%3A01Z&sks=b&skv=2021-08-06&sig=WwXa%2B0h9zngW3gIqRp6dxzx8ILDy5Phnvqk5WDtcq1I%3D",
-  },
-  {
-    url: "https://oaidalleapiprodscus.blob.core.windows.net/private/org-OtyVjKo51CJ3Rwe2kOSDQ7B6/user-W3tfT5w8vZ5ZNUzvLdNkph6z/img-GJGqsPxcMzDTOS6lGx1kb7H7.png?st=2023-07-01T05%3A05%3A08Z&se=2023-07-01T07%3A05%3A08Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-06-30T20%3A28%3A01Z&ske=2023-07-01T20%3A28%3A01Z&sks=b&skv=2021-08-06&sig=WwXa%2B0h9zngW3gIqRp6dxzx8ILDy5Phnvqk5WDtcq1I%3D",
-  },
-];
-const IndexPage = () => {
-  const [prompt, setPrompt] = useState("");
-  const [imagePrompt, setImagePrompt] = useState("");
-  const [response, setResponse] = useState("");
-  const [responseImage, setResponseImage] = useState<ImagesResponseDataInner[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingImage, setIsLoadingImage] = useState(false);
-
-  const clearAll = () => {
-    setPrompt("");
-    setResponse("");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prompt) {
-      alert("Please enter a valid prompt.");
-      setResponse("");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const openai = new OpenAI(OPEN_AI_API_KEY);
-      const res = await openai.generateText(prompt);
-      if (!res) {
-        console.warn("Nothing returned from OpenAI API.");
-        return;
-      }
-      setResponse(res);
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmitImage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!imagePrompt) {
-      alert("Please enter a valid prompt.");
-      setResponse("");
-      return;
-    }
-
-    try {
-      setIsLoadingImage(true);
-      const openai = new OpenAI(OPEN_AI_API_KEY);
-      const res = await openai.generateImage(imagePrompt);
-      if (!res) {
-        console.warn("Nothing returned from OpenAI API.");
-        return;
-      }
-      setResponseImage(res);
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    } finally {
-      setIsLoadingImage(false);
-    }
-  };
-
+export default function index() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Ad generator</h1>
-      <h2>Text generator</h2>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="w-296 mt-5 mb-5">
-          <textarea
-            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900"
-            placeholder="Enter prompt for chat..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-          />
-        </div>
-        <div>
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Submit
-            </button>
-          )}
-        </div>
-      </form>
+    <div>
+      <h1 className="text-3xl font-bold mb-4">AI Ad Generator</h1>
       <div>
+        <p>OpenAI API を利用した自動広告生成ツールです。</p>
         <p>
-          <strong>Response</strong>
+          上のタブからテキストを生成するときは Text を、画像を生成するときは
+          Image をクリックしてください。
         </p>
-        <div className="border border-gray-300 bg-gray-600 rounded p-3 my-3 min-h-20">
-          {response}
-        </div>
-      </div>
-      <h2>Image generator</h2>
-      <form onSubmit={handleSubmitImage} className="mb-4">
-        <div className="mt-5 mb-5">
-          <textarea
-            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
-            value={imagePrompt}
-            placeholder="Enter prompt for image..."
-            onChange={(e) => setImagePrompt(e.target.value)}
-          />
-        </div>
-        <div>
-          {isLoadingImage ? (
-            <Loader />
-          ) : (
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Submit
-            </button>
-          )}
-        </div>
-      </form>
-      <div>
         <p>
-          <strong>Image</strong>
+          テキスト生成と画像生成にはそれぞれ以下の API
+          とモデルを利用しています。
         </p>
-        <div className="border border-gray-300 rounded p-3 my-3 min-h-20 grid-cols-2">
-          {images.map((imgData, i) => {
-            return (
-              <Image
-                width="256"
-                height="256"
-                className=""
-                key={i}
-                src={imgData.url || ""}
-                alt=""
-              />
-            );
-          })}
-          {/* {responseImage.map((imgData, i) => {
-            return (
-              <Image
-                className="w-auto"
-                key={i}
-                src={imgData.url || ""}
-                alt=""
-              />
-            );
-          })} */}
-        </div>
+        <ul className="list-disc ml-5 mt-2">
+          <li>
+            <LinkText
+              link="https://platform.openai.com/docs/guides/gpt/chat-completions-api"
+              text="Completions API (gpt-3.5-turbo)"
+            />
+          </li>
+          <li>
+            <LinkText
+              link="https://platform.openai.com/docs/guides/images/introduction"
+              text="Image generation API (DALL·E)"
+            />
+          </li>
+        </ul>
       </div>
-      <div>
-        <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-10"
-          onClick={clearAll}
-        >
-          Clear
-        </button>
-      </div>
+      <h2 className="text-xl font-bold my-4">テキスト生成</h2>
+      <ul className="list-disc ml-5">
+        <li>
+          テキストボックスにプロンプトを入力して、Submit
+          ボタンを押してください。
+        </li>
+        <li>レスポンスの中にあるコピーボタンでテキストをコピーできます。</li>
+        <li>Clear ボタンを押すとプロンプトとレスポンスがクリアされます。</li>
+        <li>プロンプト作成のベストプラクティスは下記を参考にしてください。</li>
+        <LinkText
+          link="https://platform.openai.com/docs/guides/gpt-best-practices"
+          text="GPT best practices"
+        />
+      </ul>
+      <h2 className="text-xl font-bold my-4">画像生成</h2>
+      <ul className="list-disc ml-5">
+        <li>
+          テキストボックスにプロンプトを入力して、Batch size
+          (同時に作成する画像数) を選択してから Submit ボタンを押してください。
+        </li>
+        <li>Batch size は 1 - 10 の範囲で選択できます。</li>
+        <li>
+          画像をクリックすると別タブで開きます。なお、一定時間が経過すると保存先サーバーから削除されてしまうようです。
+        </li>
+        <li>
+          画像を右クリックして開いたメニューから画像をダウンロードできます。
+        </li>
+      </ul>
     </div>
   );
-};
-
-export default IndexPage;
+}

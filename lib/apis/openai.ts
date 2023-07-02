@@ -1,5 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
-import { CREATE_IMAGE_NUM, OPEN_AI_TEXT_MODEL } from "./const";
+import { OPEN_AI_TEXT_MODEL, TEXT_GENERATE_TEMPERATURE } from "./const";
 
 export class OpenAI {
   openai: OpenAIApi;
@@ -12,7 +12,14 @@ export class OpenAI {
     try {
       const response = await this.openai.createChatCompletion({
         model,
-        messages: [{ role: "user", content: prompt }],
+        temperature: TEXT_GENERATE_TEMPERATURE,
+        messages: [
+          {
+            role: "system",
+            content: "あなたはWeb広告企業で働く有能なコピーライターです。",
+          },
+          { role: "user", content: prompt },
+        ],
       });
       console.log(
         `request cost: ${response?.data?.usage?.total_tokens} tokens`
@@ -24,11 +31,11 @@ export class OpenAI {
     }
   }
 
-  async generateImage(prompt: string) {
+  async generateImage(prompt: string, imageBatchSize: number = 1) {
     try {
       const response = await this.openai.createImage({
         prompt,
-        n: CREATE_IMAGE_NUM,
+        n: imageBatchSize,
       });
       console.log(response?.data?.data);
       return response?.data?.data;

@@ -9,7 +9,11 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      content: {
+        "open-external-link-icon": 'url("/icons/open-external-link-icon.svg")',
+      },
+    },
   },
   plugins: [],
 };

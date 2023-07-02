@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 // These styles apply to every route in the application
 import "../styles/globals.css";
+import Header from "../components/header";
 
 const metadata: Metadata = {
   title: "Create Next App",
@@ -13,5 +14,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <main className="max-w-screen-sm text-slate-100">{children}</main>;
+  return (
+    <div>
+      <Header />
+      <main className="max-w-screen-sm text-slate-100 font-sans">
+        {children}
+      </main>
+    </div>
+  );
 }

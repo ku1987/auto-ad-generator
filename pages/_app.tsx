@@ -5,7 +5,7 @@ import RootLayout from "../app/layout";
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <RootLayout>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </RootLayout>
   );
 }

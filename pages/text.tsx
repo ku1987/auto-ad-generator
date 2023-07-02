@@ -5,7 +5,7 @@ import { useState } from "react";
 import { OpenAI } from "../lib/apis/openai";
 import { Loader } from "../components/spinner";
 import { OPEN_AI_API_KEY } from "../lib/apis/const";
-import { CopyIcon } from "../components/copy-icon";
+import IconCopy from "../components/copy-text";
 
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
@@ -88,7 +88,7 @@ const IndexPage = () => {
             }}
             className="cursor-pointer absolute right-2 top-1"
           >
-            <CopyIcon />
+            <IconCopy />
           </span>
           {response}
         </div>

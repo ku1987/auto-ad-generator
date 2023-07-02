@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { OpenAI } from "../lib/apis/openai";
-import { Loader } from "../components/spinner";
 import { OPEN_AI_API_KEY } from "../lib/apis/const";
 import IconCopy from "../components/copy-text";
 
@@ -11,15 +10,18 @@ const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const clearAll = () => {
     setPrompt("");
     setResponse("");
+    setIsError(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsError(false);
       setIsLoading(true);
       setResponse("");
       const openai = new OpenAI(OPEN_AI_API_KEY);
@@ -31,7 +33,7 @@ const IndexPage = () => {
       setResponse(res);
     } catch (error) {
       console.error("Error:", error);
-      throw error;
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -49,6 +51,14 @@ const IndexPage = () => {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-4">Text generator</h1>
+      <div>
+        <button
+          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
+          onClick={clearAll}
+        >
+          Clear
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="w-296 mt-5 mb-5">
           <textarea
@@ -75,6 +85,7 @@ const IndexPage = () => {
         </div>
       </form>
       <div>
+        {isError ? <p>Something went wrong. Please try again.</p> : null}
         <p>
           <strong>Response</strong>
         </p>
@@ -92,14 +103,6 @@ const IndexPage = () => {
           </span>
           {response}
         </div>
-      </div>
-      <div>
-        <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-10"
-          onClick={clearAll}
-        >
-          Clear
-        </button>
       </div>
     </div>
   );

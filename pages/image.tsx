@@ -3,39 +3,28 @@
 import { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import { ImagesResponseDataInner } from "openai";
-import { v4 as uuidv4 } from "uuid";
 import { OpenAI } from "../lib/apis/openai";
-import { Loader } from "../components/spinner";
 import { OPEN_AI_API_KEY } from "../lib/apis/const";
 import Link from "next/link";
 
-const images = [
-  {
-    url: "/lfc.jpg",
-  },
-  {
-    url: "/lfc.jpg",
-  },
-  {
-    url: "/lfc.jpg",
-  },
-];
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState<ImagesResponseDataInner[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
   const clearAll = () => {
     setPrompt("");
     setResponse([]);
+    setIsError(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsLoading(true);
+      setIsError(false);
       setResponse([]);
       const openai = new OpenAI(OPEN_AI_API_KEY);
       const res = await openai.generateImage(prompt, imageBatchSize);
@@ -59,6 +48,14 @@ const IndexPage = () => {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-4">Image generator</h1>
+      <div>
+        <button
+          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
+          onClick={clearAll}
+        >
+          Clear
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mt-5 mb-5">
           <textarea
@@ -96,7 +93,7 @@ const IndexPage = () => {
               Submit
             </button>
           )}
-          {isError ?? <p>Something went wrong. Please try again.</p>}
+          {isError ? <p>Something went wrong. Please try again.</p> : null}
         </div>
       </form>
       <div>
@@ -119,14 +116,6 @@ const IndexPage = () => {
             );
           })}
         </div>
-      </div>
-      <div>
-        <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-10"
-          onClick={clearAll}
-        >
-          Clear
-        </button>
       </div>
     </div>
   );

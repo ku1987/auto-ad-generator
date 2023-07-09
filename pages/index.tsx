@@ -18,7 +18,7 @@ export default function index() {
           <li>
             <LinkText
               link="https://platform.openai.com/docs/guides/gpt/chat-completions-api"
-              text="Completions API (gpt-3.5-turbo)"
+              text="Chat Completions API (gpt-3.5-turbo)"
             />
           </li>
           <li>
@@ -49,7 +49,19 @@ export default function index() {
           テキストボックスにプロンプトを入力して、Batch size
           (同時に作成する画像数) を選択してから Submit ボタンを押してください。
         </li>
+        <li>プロンプトは英語で、文章の形式で入力してください。</li>
         <li>Batch size は 1 - 10 の範囲で選択できます。</li>
+        <li>
+          画質を高画質・中画質・低画質から選択できます。画質が高いほど処理に時間を要します。
+        </li>
+        <li>
+          ひとつの API キーで 1
+          分間に生成できる画像は50枚までで、これを超えるとエラーになります。
+        </li>
+        <LinkText
+          link="https://platform.openai.com/docs/guides/rate-limits/overview"
+          text="Rate limits"
+        />
         <li>
           画像をクリックすると別タブで開きます。なお、一定時間が経過すると保存先サーバーから削除されてしまうようです。
         </li>

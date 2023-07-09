@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { OpenAI } from "../lib/apis/openai";
-import { OPEN_AI_API_KEY } from "../lib/apis/const";
+import { OPEN_AI_API_KEY, OPEN_AI_TEXT_MODEL } from "../lib/apis/const";
 import IconCopy from "../components/copy-text";
 
 const IndexPage = () => {
@@ -25,7 +25,12 @@ const IndexPage = () => {
       setIsLoading(true);
       setResponse("");
       const openai = new OpenAI(OPEN_AI_API_KEY);
-      const res = await openai.generateText(prompt);
+      const roleContent = "あなたはWeb広告企業で働く有能なコピーライターです。";
+      const res = await openai.generateText(
+        prompt,
+        OPEN_AI_TEXT_MODEL.GPT_3_5_TURBO,
+        roleContent
+      );
       if (!res) {
         console.warn("Nothing returned from OpenAI API.");
         return;
@@ -85,7 +90,11 @@ const IndexPage = () => {
         </div>
       </form>
       <div>
-        {isError ? <p>Something went wrong. Please try again.</p> : null}
+        {isError ? (
+          <p className="text-orange-600">
+            Something went wrong. Please try again.
+          </p>
+        ) : null}
         <p>
           <strong>Response</strong>
         </p>

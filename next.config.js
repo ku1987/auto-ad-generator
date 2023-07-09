@@ -11,6 +11,7 @@ const nextConfig = {
   swcMinify: true,
   env: {
     openAiApiKey: process.env.OPENAI_API_KEY,
+    stabilityAiApiKey: process.env.STABILITY_API_KEY,
   },
 };
 

@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, CreateImageRequestSizeEnum, OpenAIApi } from "openai";
 import { OPEN_AI_TEXT_MODEL, TEXT_GENERATE_TEMPERATURE } from "./const";
 
 export class OpenAI {
@@ -8,7 +8,11 @@ export class OpenAI {
     this.openai = new OpenAIApi(new Configuration({ apiKey }));
   }
 
-  async generateText(prompt: string, model = OPEN_AI_TEXT_MODEL) {
+  async generateText(
+    prompt: string,
+    model: string = OPEN_AI_TEXT_MODEL.GPT_3_5_TURBO,
+    roleContent: string = ""
+  ) {
     try {
       const response = await this.openai.createChatCompletion({
         model,
@@ -16,7 +20,7 @@ export class OpenAI {
         messages: [
           {
             role: "system",
-            content: "あなたはWeb広告企業で働く有能なコピーライターです。",
+            content: roleContent,
           },
           { role: "user", content: prompt },
         ],
@@ -31,11 +35,16 @@ export class OpenAI {
     }
   }
 
-  async generateImage(prompt: string, imageBatchSize: number = 1) {
+  async generateImage(
+    prompt: string,
+    imageSize: CreateImageRequestSizeEnum,
+    imageBatchSize: number = 1
+  ) {
     try {
       const response = await this.openai.createImage({
         prompt,
         n: imageBatchSize,
+        size: imageSize,
       });
       console.log(response?.data?.data);
       return response?.data?.data;

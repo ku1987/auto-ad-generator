@@ -1,3 +1,19 @@
+import { CreateImageRequestSizeEnum } from "openai";
+
 export const OPEN_AI_API_KEY = process.env.openAiApiKey ?? "";
-export const OPEN_AI_TEXT_MODEL = "gpt-3.5-turbo";
+export const STABILITY_API_KEY = process.env.stabilityAiApiKey ?? "";
+export const OPEN_AI_TEXT_MODEL = {
+  GPT_3_5_TURBO: "gpt-3.5-turbo",
+};
 export const TEXT_GENERATE_TEMPERATURE = 0.8;
+export const IMAGE_QUALITY = {
+  HIGH: CreateImageRequestSizeEnum._1024x1024,
+  MID: CreateImageRequestSizeEnum._512x512,
+  LOW: CreateImageRequestSizeEnum._256x256,
+};
+
+export const DEFAULT_IMAGE_PROMPT =
+  "ultra realistic, hyper detail, outdoor lighting, wide-shot, Canon EOS R3, nikon, f/1.4, ISO 200, 1/160s, 8K, RAW, unedited, symmetrical balance, in-frame, 8K";
+
+export const DEFAULT_IMAGE_NEGATIVE_PROMPT =
+  "((out of frame)), ((extra fingers)), mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), (((tiling))), ((naked)), ((tile)), ((fleshpile)), ((ugly)), (((abstract))), blurry, ((bad anatomy)), ((bad proportions)), ((extra limbs)), cloned face, (((skinny))), glitchy, ((extra breasts)), ((double torso)), ((extra arms)), ((extra hands)), ((mangled fingers)), ((missing breasts)), (missing lips), ((ugly face)), ((fat)), ((extra legs))";

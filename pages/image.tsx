@@ -13,31 +13,33 @@ import { StableDiffusion } from "../lib/apis/stable-diffusion";
 
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
   const [response, setResponse] = useState<string[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
   const [peopleCount, setPeopleCount] = useState("one person");
-  const [race, setRace] = useState("japanese");
+  const [race, setRace] = useState("Japanese");
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [isError, setIsError] = useState("");
 
   const clearAll = () => {
     setPrompt("");
+    setNegativePrompt("");
     setResponse([]);
-    setIsError(false);
+    setIsError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      setIsError(false);
+      setIsError("");
       setResponse([]);
       const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
-      const updatedPrompt = `,${prompt},${race},${peopleCount},${DEFAULT_IMAGE_PROMPT}`;
-      const negativePrompt = `${DEFAULT_IMAGE_NEGATIVE_PROMPT}`;
+      const updatedPrompt = `((${race})),((${peopleCount})),(((${prompt}))),${DEFAULT_IMAGE_PROMPT}`;
+      const updatedNegativePrompt = `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`;
       const res = await stableDiffusion.generateImage(
         updatedPrompt,
-        negativePrompt,
+        updatedNegativePrompt,
         imageBatchSize
       );
       if (!res) {
@@ -45,9 +47,9 @@ const IndexPage = () => {
         return;
       }
       setResponse(res);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
-      setIsError(true);
+      setIsError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +86,15 @@ const IndexPage = () => {
             value={prompt}
             placeholder="Enter prompt for image..."
             onChange={(e) => setPrompt(e.target.value)}
+          />
+        </div>
+        <div className="mt-5 mb-5">
+          <textarea
+            required
+            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
+            value={negativePrompt}
+            placeholder="Enter negative prompt for image..."
+            onChange={(e) => setNegativePrompt(e.target.value)}
           />
         </div>
         <div className="mb-5">
@@ -135,8 +146,8 @@ const IndexPage = () => {
               className="mx-1"
               id="japanese"
               type="radio"
-              value="japanese"
-              checked={race === "japanese"}
+              value="Japanese"
+              checked={race === "Japanese"}
               onChange={handleRaceChange}
             />
             <label htmlFor="japanese">日本人</label>
@@ -144,8 +155,8 @@ const IndexPage = () => {
               className="mx-1"
               id="caucasian"
               type="radio"
-              value="caucasian"
-              checked={race === "caucasian"}
+              value="Caucasian"
+              checked={race === "Caucasian"}
               onChange={handleRaceChange}
             />
             <label htmlFor="caucasian">欧米人</label>
@@ -165,9 +176,7 @@ const IndexPage = () => {
             </button>
           )}
           {isError ? (
-            <p className="text-orange-600 mt-5">
-              Something went wrong. Please try again.
-            </p>
+            <p className="text-orange-600 mt-5">Error: {isError}</p>
           ) : null}
         </div>
       </form>

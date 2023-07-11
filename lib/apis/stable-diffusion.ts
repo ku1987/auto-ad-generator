@@ -39,7 +39,9 @@ export class StableDiffusion {
       throw new Error("Request failed with status: " + response.status);
     }
     const result = await response.json();
-    console.log(result);
+    if (result.status === "error" || result.status === "failed") {
+      throw new Error("Request failed: " + result.messege);
+    }
     return result.output;
   }
 }

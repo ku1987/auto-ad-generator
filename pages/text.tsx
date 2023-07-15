@@ -10,18 +10,18 @@ const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const clearAll = () => {
     setPrompt("");
     setResponse("");
-    setIsError(false);
+    setErrorMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setIsError(false);
+      setErrorMessage("");
       setIsLoading(true);
       setResponse("");
       const openai = new OpenAI(OPEN_AI_API_KEY);
@@ -32,13 +32,14 @@ const IndexPage = () => {
         roleContent
       );
       if (!res) {
-        console.warn("Nothing returned from OpenAI API.");
-        return;
+        throw new Error("生成に失敗しました。再度試してください。");
       }
       setResponse(res);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
-      setIsError(true);
+      setErrorMessage(
+        `${error.response?.data?.error?.code}: ${error.response?.data?.error?.message}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -68,8 +69,8 @@ const IndexPage = () => {
         <div className="w-296 mt-5 mb-5">
           <textarea
             required
-            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900"
-            placeholder="Enter prompt for chat..."
+            className="w-full h-72 bg-white border-slate-100 border-b rounded p-3 text-slate-900"
+            placeholder="日本語でプロンプトを入力してください。"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
@@ -90,17 +91,13 @@ const IndexPage = () => {
         </div>
       </form>
       <div>
-        {isError ? (
-          <p className="text-orange-600">
-            Something went wrong. Please try again.
-          </p>
-        ) : null}
+        {errorMessage && <p className="text-orange-600">{errorMessage}</p>}
         <p>
           <strong>Response</strong>
         </p>
         <div
           id="response"
-          className="relative border border-gray-300 text-slate-900 bg-gray-400 rounded p-3 my-3 min-h-20"
+          className="whitespace-pre-wrap relative border border-gray-300 text-slate-900 bg-gray-400 rounded p-3 my-3 min-h-20"
         >
           <span
             onClick={(e) => {

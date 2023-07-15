@@ -2,13 +2,13 @@
 
 import { ChangeEvent, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import {
   DEFAULT_IMAGE_NEGATIVE_PROMPT,
   DEFAULT_IMAGE_PROMPT,
   STABILITY_API_KEY,
 } from "../lib/apis/const";
-import Link from "next/link";
 import { StableDiffusion } from "../lib/apis/stable-diffusion";
 
 const IndexPage = () => {
@@ -16,8 +16,8 @@ const IndexPage = () => {
   const [negativePrompt, setNegativePrompt] = useState("");
   const [response, setResponse] = useState<string[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
-  const [peopleCount, setPeopleCount] = useState("one person");
   const [race, setRace] = useState("Japanese");
+  const [angle, setAngle] = useState("wide shot");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState("");
 
@@ -35,18 +35,27 @@ const IndexPage = () => {
       setIsError("");
       setResponse([]);
       const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
-      const updatedPrompt = `((${race})),((${peopleCount})),(((${prompt}))),${DEFAULT_IMAGE_PROMPT}`;
-      const updatedNegativePrompt = `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`;
-      const res = await stableDiffusion.generateImage(
+      const updatedPrompt = `((${race})),((${angle})),(((${prompt}))),${DEFAULT_IMAGE_PROMPT}`;
+      const updatedNegativePrompt = negativePrompt
+        ? `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`
+        : DEFAULT_IMAGE_NEGATIVE_PROMPT;
+      const result = await stableDiffusion.generateImage(
         updatedPrompt,
         updatedNegativePrompt,
         imageBatchSize
       );
-      if (!res) {
-        console.warn("Nothing returned from StableDiffusion API.");
+      if (!result || result.status === "failed") {
+        throw new Error("生成に失敗しました。再度試してください。");
+      }
+      if (result.status === "success" && result.output.length > 0) {
+        setResponse(result.output);
         return;
       }
-      setResponse(res);
+      if (result.status === "processing") {
+        throw new Error(
+          "連続してリクエストがあったため、生成に失敗しました。数分時間を置いてから再度試してください。"
+        );
+      }
     } catch (error: any) {
       console.error("Error:", error);
       setIsError(error.message);
@@ -60,7 +69,7 @@ const IndexPage = () => {
   };
 
   const handleRadioBoxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPeopleCount(event.target.value);
+    setAngle(event.target.value);
   };
 
   const handleRaceChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -84,22 +93,21 @@ const IndexPage = () => {
             required
             className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={prompt}
-            placeholder="Enter prompt for image..."
+            placeholder="プロンプト (英文でメインの対象を入力する。例: A man working out in a gym)"
             onChange={(e) => setPrompt(e.target.value)}
           />
         </div>
         <div className="mt-5 mb-5">
           <textarea
-            required
             className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={negativePrompt}
-            placeholder="Enter negative prompt for image..."
+            placeholder="ネガティブプロンプト (英文で出力してほしくないものを入力する。例: Running machine, glove)"
             onChange={(e) => setNegativePrompt(e.target.value)}
           />
         </div>
         <div className="mb-5">
           <p>
-            Batch size:
+            生成する画像数:
             <input
               value={imageBatchSize}
               type="number"
@@ -111,34 +119,34 @@ const IndexPage = () => {
             ></input>
           </p>
           <div className="my-2">
-            <p className="my-2">人物</p>
+            <p className="my-2">アングル</p>
             <input
               className="mx-1"
-              id="one-person"
+              id="wide"
               type="radio"
-              value="one person"
-              checked={peopleCount === "one person"}
+              value="wide shot"
+              checked={angle === "wide shot"}
               onChange={handleRadioBoxChange}
             />
-            <label htmlFor="one-person">1人</label>
+            <label htmlFor="wide">ワイドショット</label>
             <input
               className="mx-1"
-              id="two-people"
+              id="middle"
               type="radio"
-              value="two people"
-              checked={peopleCount === "two people"}
+              value="middle shot"
+              checked={angle === "middle shot"}
               onChange={handleRadioBoxChange}
             />
-            <label htmlFor="two-people">2人</label>
+            <label htmlFor="middle">ミドルショット</label>
             <input
               className="mx-1"
-              id="multiple"
+              id="close-up"
               type="radio"
-              value="multiple people"
-              checked={peopleCount === "multiple people"}
+              value="close-up"
+              checked={angle === "close-up"}
               onChange={handleRadioBoxChange}
             />
-            <label htmlFor="multiple">複数人 (不特定)</label>
+            <label htmlFor="close-up">クローズアップ</label>
           </div>
           <div className="my-2">
             <p className="my-2">人種</p>

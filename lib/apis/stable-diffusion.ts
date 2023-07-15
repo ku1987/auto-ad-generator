@@ -1,6 +1,18 @@
+interface GenerationResult {
+  status: string;
+  tip: string;
+  eta: number;
+  messege: string;
+  fetch_result: string;
+  id: number;
+  output: string[];
+  meta: any;
+  generationTime?: number;
+}
+
 export class StableDiffusion {
   apiKey = "";
-  baseUrl = "https://stablediffusionapi.com/api/v3/text2img";
+  baseUrl = "https://stablediffusionapi.com/api/v3";
   constructor(apiKey: string) {
     this.apiKey = apiKey;
   }
@@ -9,13 +21,13 @@ export class StableDiffusion {
     prompt: string,
     negativePrompt: string,
     imageBatchSize: number = 1
-  ): Promise<string[]> {
+  ): Promise<GenerationResult> {
     const requestBody = {
       key: this.apiKey,
       prompt,
       negative_prompt: negativePrompt,
-      width: "512",
-      height: "512",
+      width: "1024",
+      height: "768",
       samples: imageBatchSize,
       num_inference_steps: "20",
       safety_checker: "no",
@@ -28,8 +40,9 @@ export class StableDiffusion {
     const headers = {
       "Content-Type": "application/json",
     };
+    const url = `${this.baseUrl}/text2img`;
 
-    const response = await fetch(this.baseUrl, {
+    const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
@@ -38,10 +51,10 @@ export class StableDiffusion {
       console.error(response.body);
       throw new Error("Request failed with status: " + response.status);
     }
-    const result = await response.json();
+    const result: GenerationResult = await response.json();
     if (result.status === "error" || result.status === "failed") {
       throw new Error("Request failed: " + result.messege);
     }
-    return result.output;
+    return result;
   }
 }

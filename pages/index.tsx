@@ -23,8 +23,8 @@ export default function index() {
           </li>
           <li>
             <LinkText
-              link="https://platform.openai.com/docs/guides/images/introduction"
-              text="Image generation API (DALL·E)"
+              link="https://documenter.getpostman.com/view/18679074/2s83zdwReZ#454773c9-de34-4030-af9b-8a976cbf264c"
+              text="Stable Diffusion v3 API"
             />
           </li>
         </ul>
@@ -32,10 +32,12 @@ export default function index() {
       <h2 className="text-xl font-bold my-4">テキスト生成</h2>
       <ul className="list-disc ml-5">
         <li>
-          テキストボックスにプロンプトを入力して、Submit
+          テキストボックスに日本語でプロンプトを入力して、Submit
           ボタンを押してください。
         </li>
-        <li>レスポンスの中にあるコピーボタンでテキストをコピーできます。</li>
+        <li>
+          レスポンスの中にあるコピーボタンで生成されたテキストをコピーできます。
+        </li>
         <li>Clear ボタンを押すとプロンプトとレスポンスがクリアされます。</li>
         <li>プロンプト作成のベストプラクティスは下記を参考にしてください。</li>
         <LinkText
@@ -46,28 +48,21 @@ export default function index() {
       <h2 className="text-xl font-bold my-4">画像生成</h2>
       <ul className="list-disc ml-5">
         <li>
-          テキストボックスにプロンプトを入力して、Batch size
-          (同時に作成する画像数) を選択してから Submit ボタンを押してください。
-        </li>
-        <li>プロンプトは英語で、文章の形式で入力してください。</li>
-        <li>Batch size は 1 - 10 の範囲で選択できます。</li>
-        <li>
-          画質を高画質・中画質・低画質から選択できます。画質が高いほど処理に時間を要します。
+          テキストボックスに英語でプロンプトを入力して、生成する画像数を 1 - 10
+          の中から選択して Submit ボタンを押してください。
         </li>
         <li>
-          ひとつの API キーで 1
-          分間に生成できる画像は50枚までで、これを超えるとエラーになります。
+          連続して多くの画像を生成すると、エラーになることがあります。そのときは少し時間をおいてからリトライしてください。
         </li>
-        <LinkText
-          link="https://platform.openai.com/docs/guides/rate-limits/overview"
-          text="Rate limits"
-        />
-        <li>
-          画像をクリックすると別タブで開きます。なお、一定時間が経過すると保存先サーバーから削除されてしまうようです。
-        </li>
+        <li>画像をクリックすると別タブで開きます。</li>
         <li>
           画像を右クリックして開いたメニューから画像をダウンロードできます。
         </li>
+        <li>プロンプト作成のベストプラクティスは下記を参考にしてください。</li>
+        <LinkText
+          link="https://stable-diffusion-art.com/prompt-guide/"
+          text="Stable Diffusion prompt: a definitive guide"
+        />
       </ul>
     </div>
   );

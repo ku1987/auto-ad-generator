@@ -5,6 +5,7 @@ import { useState } from "react";
 import { OpenAI } from "../lib/apis/openai";
 import { OPEN_AI_API_KEY, OPEN_AI_TEXT_MODEL } from "../lib/apis/const";
 import IconCopy from "../components/copy-text";
+import { Loader } from "../components/loader";
 
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
@@ -37,9 +38,10 @@ const IndexPage = () => {
       setResponse(res);
     } catch (error: any) {
       console.error("Error:", error);
-      setErrorMessage(
-        `${error.response?.data?.error?.code}: ${error.response?.data?.error?.message}`
-      );
+      const message = error.response
+        ? `${error.response.data?.error?.code}: ${error.response.data?.error?.message}`
+        : error.message;
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
@@ -77,9 +79,7 @@ const IndexPage = () => {
         </div>
         <div>
           {isLoading ? (
-            <div className="inline-block bg-blue-300 text-slate-100 font-bold py-2 px-4 rounded">
-              Submit
-            </div>
+            <Loader />
           ) : (
             <button
               type="submit"
@@ -97,7 +97,7 @@ const IndexPage = () => {
         </p>
         <div
           id="response"
-          className="whitespace-pre-wrap relative border border-gray-300 text-slate-900 bg-gray-400 rounded p-3 my-3 min-h-20"
+          className="whitespace-pre-wrap min-h-32 relative border border-gray-300 text-slate-900 bg-gray-400 rounded p-3 my-3 min-h-20"
         >
           <span
             onClick={(e) => {

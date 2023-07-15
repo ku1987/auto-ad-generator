@@ -10,6 +10,7 @@ import {
   STABILITY_API_KEY,
 } from "../lib/apis/const";
 import { StableDiffusion } from "../lib/apis/stable-diffusion";
+import { Loader } from "../components/loader";
 
 const IndexPage = () => {
   const [prompt, setPrompt] = useState("");
@@ -53,7 +54,7 @@ const IndexPage = () => {
       }
       if (result.status === "processing") {
         throw new Error(
-          "連続してリクエストがあったため、生成に失敗しました。数分時間を置いてから再度試してください。"
+          "連続してリクエストがあったため、生成に失敗しました。1分ほど時間を置いてから再度試してください。"
         );
       }
     } catch (error: any) {
@@ -93,7 +94,7 @@ const IndexPage = () => {
             required
             className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={prompt}
-            placeholder="プロンプト (英文でメインの対象を入力する。例: A man working out in a gym)"
+            placeholder="英語でプロンプトを入力してください。例: A man working out in a gym"
             onChange={(e) => setPrompt(e.target.value)}
           />
         </div>
@@ -101,7 +102,7 @@ const IndexPage = () => {
           <textarea
             className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={negativePrompt}
-            placeholder="ネガティブプロンプト (英文で出力してほしくないものを入力する。例: Running machine, glove)"
+            placeholder="出力したくないものがある場合、英語で入力してください。例: Running machine"
             onChange={(e) => setNegativePrompt(e.target.value)}
           />
         </div>
@@ -172,9 +173,7 @@ const IndexPage = () => {
         </div>
         <div>
           {isLoading ? (
-            <div className="inline-block bg-blue-300 text-slate-100 font-bold py-2 px-4 rounded">
-              Submit
-            </div>
+            <Loader />
           ) : (
             <button
               type="submit"
@@ -197,7 +196,14 @@ const IndexPage = () => {
                 key={i}
               >
                 <Link target="_blank" href={imgUrl ?? ""}>
-                  <Image src={imgUrl || ""} width={300} height={200} alt="" />
+                  <Image
+                    placeholder="blur"
+                    blurDataURL="/placeholder.png"
+                    src={imgUrl || ""}
+                    width={300}
+                    height={200}
+                    alt=""
+                  />
                 </Link>
               </div>
             );

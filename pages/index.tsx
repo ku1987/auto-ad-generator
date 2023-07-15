@@ -28,6 +28,9 @@ export default function index() {
             />
           </li>
         </ul>
+        <p>
+          テキスト生成と画像生成どちらも、ジムや広告関連の出力をするように設定しているため、他のものを生成しようとするとうまくいかない可能性があります。
+        </p>
       </div>
       <h2 className="text-xl font-bold my-4">テキスト生成</h2>
       <ul className="list-disc ml-5">

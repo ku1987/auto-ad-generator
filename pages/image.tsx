@@ -36,7 +36,7 @@ const IndexPage = () => {
       setIsError("");
       setResponse([]);
       const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
-      const updatedPrompt = `((${race})),((${angle})),(((${prompt}))),${DEFAULT_IMAGE_PROMPT}`;
+      const updatedPrompt = `(((${prompt}))),((${race})),((${angle})),${DEFAULT_IMAGE_PROMPT}`;
       const updatedNegativePrompt = negativePrompt
         ? `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`
         : DEFAULT_IMAGE_NEGATIVE_PROMPT;
@@ -50,6 +50,11 @@ const IndexPage = () => {
       }
       if (result.status === "success" && result.output.length > 0) {
         setResponse(result.output);
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
         return;
       }
       if (result.status === "processing") {

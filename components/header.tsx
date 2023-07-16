@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <header className="my-10">
       <nav>
-        <ul className="flex space-x-4">
+        <ul className="flex space-x-6">
           <li
             onClick={(e) => {
               handleLinkClick("");
@@ -35,6 +35,14 @@ const Header = () => {
             className="cursor-pointer hover:text-slate-400"
           >
             Image
+          </li>
+          <li
+            onClick={(e) => {
+              handleLinkClick("image-variation");
+            }}
+            className="cursor-pointer hover:text-slate-400"
+          >
+            Image Variation
           </li>
         </ul>
       </nav>

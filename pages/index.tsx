@@ -1,4 +1,4 @@
-import { LinkText } from "../components/link-text";
+import { LinkText } from "../components/linkText";
 
 export default function index() {
   return (

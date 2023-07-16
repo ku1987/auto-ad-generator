@@ -13,13 +13,20 @@ import { StableDiffusion } from "../lib/apis/stableDiffusion";
 import { Loader } from "../components/loader";
 import { ImageWithFallback } from "../components/imageWithFallback";
 
-const ImageGeneration = () => {
+const isValidUrl = (urlString: string) => {
+  try {
+    return Boolean(new URL(urlString));
+  } catch (e) {
+    return false;
+  }
+};
+
+const ImageVariation = () => {
+  const [initUrl, setInitUrl] = useState("");
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [response, setResponse] = useState<string[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
-  const [race, setRace] = useState("Japanese");
-  const [angle, setAngle] = useState("wide shot");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -32,18 +39,19 @@ const ImageGeneration = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidUrl(initUrl)) {
+      setErrorMessage("正しいURLを入力してください。");
+      return;
+    }
     try {
       setIsLoading(true);
       setErrorMessage("");
       setResponse([]);
       const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
-      const updatedPrompt = `(((${prompt}))),((${race})),((${angle})),${DEFAULT_IMAGE_PROMPT}`;
-      const updatedNegativePrompt = negativePrompt
-        ? `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`
-        : DEFAULT_IMAGE_NEGATIVE_PROMPT;
-      const result = await stableDiffusion.generateImage(
-        updatedPrompt,
-        updatedNegativePrompt,
+      const result = await stableDiffusion.generateImageVariations(
+        initUrl,
+        prompt,
+        negativePrompt,
         imageBatchSize
       );
       if (!result || result.status === "failed") {
@@ -83,17 +91,9 @@ const ImageGeneration = () => {
     setImageBatchSize(Number(event.target.value));
   };
 
-  const handleRadioBoxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setAngle(event.target.value);
-  };
-
-  const handleRaceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setRace(event.target.value);
-  };
-
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Image generator</h1>
+      <h1 className="text-3xl font-bold mb-4">Image variation generator</h1>
       <div>
         <button
           className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
@@ -104,19 +104,29 @@ const ImageGeneration = () => {
       </div>
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mt-5 mb-5">
+          <input
+            required
+            type="url"
+            className="w-full h-8 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
+            value={initUrl}
+            placeholder="画像のURLを入力してください。"
+            onChange={(e) => setInitUrl(e.target.value)}
+          />
+        </div>
+        <div className="mt-5 mb-5">
           <textarea
             required
-            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
+            className="w-full h-16 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={prompt}
-            placeholder="英語でプロンプトを入力してください。例: A man working out in a gym"
+            placeholder="英語でプロンプトを入力してください。"
             onChange={(e) => setPrompt(e.target.value)}
           />
         </div>
         <div className="mt-5 mb-5">
           <textarea
-            className="w-full h-32 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
+            className="w-full h-16 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={negativePrompt}
-            placeholder="出力したくないものがある場合、英語で入力してください。例: Running machine"
+            placeholder="出力したくないものがある場合、英語で入力してください。"
             onChange={(e) => setNegativePrompt(e.target.value)}
           />
         </div>
@@ -133,57 +143,6 @@ const ImageGeneration = () => {
               onChange={handleInputChange}
             ></input>
           </p>
-          <div className="my-2">
-            <p className="my-2">アングル</p>
-            <input
-              className="mx-1"
-              id="wide"
-              type="radio"
-              value="wide shot"
-              checked={angle === "wide shot"}
-              onChange={handleRadioBoxChange}
-            />
-            <label htmlFor="wide">ワイドショット</label>
-            <input
-              className="mx-1"
-              id="middle"
-              type="radio"
-              value="middle shot"
-              checked={angle === "middle shot"}
-              onChange={handleRadioBoxChange}
-            />
-            <label htmlFor="middle">ミドルショット</label>
-            <input
-              className="mx-1"
-              id="close-up"
-              type="radio"
-              value="close-up"
-              checked={angle === "close-up"}
-              onChange={handleRadioBoxChange}
-            />
-            <label htmlFor="close-up">クローズアップ</label>
-          </div>
-          <div className="my-2">
-            <p className="my-2">人種</p>
-            <input
-              className="mx-1"
-              id="japanese"
-              type="radio"
-              value="Japanese"
-              checked={race === "Japanese"}
-              onChange={handleRaceChange}
-            />
-            <label htmlFor="japanese">日本人</label>
-            <input
-              className="mx-1"
-              id="caucasian"
-              type="radio"
-              value="Caucasian"
-              checked={race === "Caucasian"}
-              onChange={handleRaceChange}
-            />
-            <label htmlFor="caucasian">欧米人</label>
-          </div>
         </div>
         <div>
           {isLoading ? (
@@ -228,4 +187,4 @@ const ImageGeneration = () => {
   );
 };
 
-export default ImageGeneration;
+export default ImageVariation;

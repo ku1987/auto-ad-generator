@@ -1,4 +1,4 @@
-import IconExternalLink from "./external-link";
+import IconExternalLink from "./externalLink";
 
 export const LinkText = ({ text, link }: { text: string; link: string }) => {
   return (

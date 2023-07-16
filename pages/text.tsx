@@ -4,10 +4,10 @@ import { useState } from "react";
 
 import { OpenAI } from "../lib/apis/openai";
 import { OPEN_AI_API_KEY, OPEN_AI_TEXT_MODEL } from "../lib/apis/const";
-import IconCopy from "../components/copy-text";
+import IconCopy from "../components/iconCopy";
 import { Loader } from "../components/loader";
 
-const IndexPage = () => {
+const TextGeneration = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -114,4 +114,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default TextGeneration;

@@ -1,7 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import Image from "next/image";
+import { ChangeEvent, MouseEventHandler, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -12,15 +11,17 @@ import {
 import { StableDiffusion } from "../lib/apis/stableDiffusion";
 import { Loader } from "../components/loader";
 import { ImageWithFallback } from "../components/imageWithFallback";
+import { RefreshButton } from "../components/refreshButton";
 
 const ImageGeneration = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [response, setResponse] = useState<string[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
-  const [race, setRace] = useState("Japanese");
   const [angle, setAngle] = useState("wide shot");
+  const [queueId, setQueueId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const clearAll = () => {
@@ -37,7 +38,7 @@ const ImageGeneration = () => {
       setErrorMessage("");
       setResponse([]);
       const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
-      const updatedPrompt = `(((${prompt}))),((${race})),((${angle})),${DEFAULT_IMAGE_PROMPT}`;
+      const updatedPrompt = `((${prompt})),((${angle})),${DEFAULT_IMAGE_PROMPT}`;
       const updatedNegativePrompt = negativePrompt
         ? `((${negativePrompt})),${DEFAULT_IMAGE_NEGATIVE_PROMPT}`
         : DEFAULT_IMAGE_NEGATIVE_PROMPT;
@@ -59,16 +60,16 @@ const ImageGeneration = () => {
         return;
       }
       if (result.status === "processing") {
-        if (result.future_links && result.future_links.length > 0) {
-          setResponse(result.future_links);
+        if (result.id) {
+          setQueueId(result.id);
           const estimated = Math.ceil(result.eta);
           setErrorMessage(
-            `連続してリクエストがあったため、生成に時間がかかっています。${estimated}秒ほど待ってから画像をクリックしてください。`
+            `リクエストが混み合っているため、生成に時間がかかっています。${estimated}秒ほど待ってから Refresh ボタンをクリックしてください。`
           );
           return;
         }
         throw new Error(
-          "連続してリクエストがあったため、生成に失敗しました。1分ほど時間を置いてから再度試してください。"
+          "リクエストが混み合っているため、生成に失敗しました。1分ほど時間を置いてから再度試してください。"
         );
       }
     } catch (error: any) {
@@ -87,8 +88,38 @@ const ImageGeneration = () => {
     setAngle(event.target.value);
   };
 
-  const handleRaceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setRace(event.target.value);
+  const handleRefresh = async (event: any) => {
+    event.preventDefault();
+    if (!queueId) {
+      throw new Error("生成に失敗しました。再度試してください。");
+    }
+    try {
+      setErrorMessage("");
+      setIsRefreshing(true);
+      const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
+      const result = await stableDiffusion.fetchQueuedData(queueId);
+      if (!result || result.status === "failed") {
+        throw new Error("生成に失敗しました。再度試してください。");
+      }
+      if (result.status === "success" && result.output.length > 0) {
+        setResponse(result.output);
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+        return;
+      }
+      if (result.status === "processing") {
+        throw new Error("生成中です。もう少しお待ち下さい。");
+      }
+      throw new Error("生成に失敗しました。再度試してください。");
+    } catch (error: any) {
+      console.error("Error:", error);
+      setErrorMessage(error.message);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -96,7 +127,7 @@ const ImageGeneration = () => {
       <h1 className="text-3xl font-bold mb-4">Image generator</h1>
       <div>
         <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
+          className="bg-red-400 hover:bg-red-500 text-white w-24 font-bold py-2 px-4 rounded mt-2"
           onClick={clearAll}
         >
           Clear
@@ -163,27 +194,6 @@ const ImageGeneration = () => {
             />
             <label htmlFor="close-up">クローズアップ</label>
           </div>
-          <div className="my-2">
-            <p className="my-2">人種</p>
-            <input
-              className="mx-1"
-              id="japanese"
-              type="radio"
-              value="Japanese"
-              checked={race === "Japanese"}
-              onChange={handleRaceChange}
-            />
-            <label htmlFor="japanese">日本人</label>
-            <input
-              className="mx-1"
-              id="caucasian"
-              type="radio"
-              value="Caucasian"
-              checked={race === "Caucasian"}
-              onChange={handleRaceChange}
-            />
-            <label htmlFor="caucasian">欧米人</label>
-          </div>
         </div>
         <div>
           {isLoading ? (
@@ -191,7 +201,7 @@ const ImageGeneration = () => {
           ) : (
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-slate-100 font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-slate-100 w-24 font-bold py-2 px-4 rounded"
             >
               Submit
             </button>
@@ -201,6 +211,9 @@ const ImageGeneration = () => {
           ) : null}
         </div>
       </form>
+      <div>
+        {queueId && RefreshButton(isRefreshing, queueId, handleRefresh)}
+      </div>
       <div>
         <div className="mt-5 grid grid-cols-2 gap-6">
           {response.map((imgUrl, i) => {
@@ -216,7 +229,7 @@ const ImageGeneration = () => {
                     src={imgUrl}
                     width={300}
                     height={200}
-                    alt=""
+                    alt={prompt}
                   />
                 </Link>
               </div>

@@ -13,7 +13,7 @@ interface GenerationResult {
 
 export class StableDiffusion {
   apiKey = "";
-  baseUrl = "https://stablediffusionapi.com/api/v4/dreambooth";
+  baseUrl = "https://stablediffusionapi.com/api/v3";
   constructor(apiKey: string) {
     this.apiKey = apiKey;
   }
@@ -26,7 +26,7 @@ export class StableDiffusion {
     const requestBody = {
       key: this.apiKey,
       prompt,
-      model_id: "majicmixrealistic",
+      // model_id: "midjourney",
       negative_prompt: negativePrompt,
       width: "1024",
       height: "768",
@@ -42,7 +42,7 @@ export class StableDiffusion {
     const headers = {
       "Content-Type": "application/json",
     };
-    const url = this.baseUrl;
+    const url = `${this.baseUrl}/text2img`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -69,7 +69,7 @@ export class StableDiffusion {
     const requestBody = {
       key: this.apiKey,
       init_image: initUrl,
-      model_id: "majicmixrealistic",
+      // model_id: "realistic-vision-v13",
       prompt,
       negative_prompt: negativePrompt,
       width: "1024",
@@ -82,12 +82,37 @@ export class StableDiffusion {
       guidance_scale: 7.5,
       webhook: null,
       track_id: null,
-      scheduler: "DDIMScheduler",
+      // scheduler: "DDIMScheduler",
     };
     const headers = {
       "Content-Type": "application/json",
     };
     const url = `${this.baseUrl}/img2img`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(requestBody),
+    });
+    if (!response.ok) {
+      console.error(response.body);
+      throw new Error("Request failed with status: " + response.status);
+    }
+    const result: GenerationResult = await response.json();
+    if (result.status === "error" || result.status === "failed") {
+      throw new Error("Request failed: " + result.messege);
+    }
+    return result;
+  }
+
+  async fetchQueuedData(queueId: number): Promise<GenerationResult> {
+    const requestBody = {
+      key: this.apiKey,
+    };
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    const url = `${this.baseUrl}/fetch/${queueId}`;
 
     const response = await fetch(url, {
       method: "POST",

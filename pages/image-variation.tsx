@@ -1,17 +1,13 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
-import {
-  DEFAULT_IMAGE_NEGATIVE_PROMPT,
-  DEFAULT_IMAGE_PROMPT,
-  STABILITY_API_KEY,
-} from "../lib/apis/const";
+import { STABILITY_API_KEY } from "../lib/apis/const";
 import { StableDiffusion } from "../lib/apis/stableDiffusion";
 import { Loader } from "../components/loader";
 import { ImageWithFallback } from "../components/imageWithFallback";
+import { RefreshButton } from "../components/refreshButton";
 
 const isValidUrl = (urlString: string) => {
   try {
@@ -27,7 +23,9 @@ const ImageVariation = () => {
   const [negativePrompt, setNegativePrompt] = useState("");
   const [response, setResponse] = useState<string[]>([]);
   const [imageBatchSize, setImageBatchSize] = useState(1);
+  const [queueId, setQueueId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const clearAll = () => {
@@ -67,16 +65,16 @@ const ImageVariation = () => {
         return;
       }
       if (result.status === "processing") {
-        if (result.future_links && result.future_links.length > 0) {
-          setResponse(result.future_links);
+        if (result.id) {
+          setQueueId(result.id);
           const estimated = Math.ceil(result.eta);
           setErrorMessage(
-            `連続してリクエストがあったため、生成に時間がかかっています。${estimated}秒ほど待ってから画像をクリックしてください。`
+            `リクエストが混み合っているため、生成に時間がかかっています。${estimated}秒ほど待ってから Refresh ボタンをクリックしてください。`
           );
           return;
         }
         throw new Error(
-          "連続してリクエストがあったため、生成に失敗しました。1分ほど時間を置いてから再度試してください。"
+          "リクエストが混み合っているため、生成に失敗しました。1分ほど時間を置いてから再度試してください。"
         );
       }
     } catch (error: any) {
@@ -91,12 +89,46 @@ const ImageVariation = () => {
     setImageBatchSize(Number(event.target.value));
   };
 
+  const handleRefresh = async (event: any) => {
+    event.preventDefault();
+    if (!queueId) {
+      throw new Error("生成に失敗しました。再度試してください。");
+    }
+    try {
+      setErrorMessage("");
+      setIsRefreshing(true);
+      const stableDiffusion = new StableDiffusion(STABILITY_API_KEY);
+      const result = await stableDiffusion.fetchQueuedData(queueId);
+      if (!result || result.status === "failed") {
+        throw new Error("生成に失敗しました。再度試してください。");
+      }
+      if (result.status === "success" && result.output.length > 0) {
+        setResponse(result.output);
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+        return;
+      }
+      if (result.status === "processing") {
+        throw new Error("生成中です。もう少しお待ち下さい。");
+      }
+      throw new Error("生成に失敗しました。再度試してください。");
+    } catch (error: any) {
+      console.error("Error:", error);
+      setErrorMessage(error.message);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-4">Image variation generator</h1>
       <div>
         <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
+          className="bg-red-400 hover:bg-red-500 text-white w-24 font-bold py-2 px-4 rounded mt-2"
           onClick={clearAll}
         >
           Clear
@@ -109,7 +141,7 @@ const ImageVariation = () => {
             type="url"
             className="w-full h-8 bg-white border-slate-100 border-b rounded p-3 text-slate-900 tw-prose-pre-bg)"
             value={initUrl}
-            placeholder="画像のURLを入力してください。"
+            placeholder="画像のURLを入力してください。対応しているファイル形式は jpeg, png です。"
             onChange={(e) => setInitUrl(e.target.value)}
           />
         </div>
@@ -150,7 +182,7 @@ const ImageVariation = () => {
           ) : (
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-slate-100 font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-slate-100 w-24 font-bold py-2 px-4 rounded"
             >
               Submit
             </button>
@@ -160,6 +192,9 @@ const ImageVariation = () => {
           ) : null}
         </div>
       </form>
+      <div>
+        {queueId && RefreshButton(isRefreshing, queueId, handleRefresh)}
+      </div>
       <div>
         <div className="mt-5 grid grid-cols-2 gap-6">
           {response.map((imgUrl, i) => {

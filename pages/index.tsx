@@ -23,8 +23,8 @@ export default function index() {
           </li>
           <li>
             <LinkText
-              link="https://documenter.getpostman.com/view/18679074/2s83zdwReZ#454773c9-de34-4030-af9b-8a976cbf264c"
-              text="Stable Diffusion v3 API"
+              link="https://stablediffusionapi.com/docs/category/stable-diffusion-api"
+              text="Stable Diffusion API"
             />
           </li>
         </ul>
@@ -54,10 +54,15 @@ export default function index() {
           テキストボックスに英語でプロンプトを入力して、生成する画像数を 1 - 10
           の中から選択して Submit ボタンを押してください。
         </li>
-        <li>
-          連続して多くの画像を生成すると、エラーになることがあります。そのときは少し時間をおいてからリトライしてください。
-        </li>
         <li>画像をクリックすると別タブで開きます。</li>
+        <li>
+          連続して多くの画像を生成したりリクエストが混み合う時間帯になると、生成に時間を要する場合があります。その場合は時間を置いてから画像をクリックしてください。
+        </li>
+        <li>
+          時間を置いてから画像を開いても Not Found
+          のままの場合、スーパーリロード (Command + Shift + R、Windows は Ctrl +
+          Shift + R) でキャッシュを削除すると開けることがあります。
+        </li>
         <li>
           画像を右クリックして開いたメニューから画像をダウンロードできます。
         </li>
@@ -66,6 +71,18 @@ export default function index() {
           link="https://stable-diffusion-art.com/prompt-guide/"
           text="Stable Diffusion prompt: a definitive guide"
         />
+      </ul>
+      <h2 className="text-xl font-bold my-4">画像バリエーション生成</h2>
+      <ul className="list-disc ml-5">
+        <li>
+          画像を指定して類似の画像のバリエーションを生成することができます。
+        </li>
+        <li>
+          画像の URL とプロンプトを入力して Submit ボタンを押してください。
+        </li>
+        <li>
+          プロンプトは必須入力ですが、画像生成時に入力したものと同じでも大丈夫です。
+        </li>
       </ul>
     </div>
   );

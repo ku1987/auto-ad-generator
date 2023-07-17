@@ -61,7 +61,7 @@ const TextGeneration = () => {
       <h1 className="text-3xl font-bold mb-4">Text generator</h1>
       <div>
         <button
-          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mt-2"
+          className="bg-red-400 hover:bg-red-500 text-white w-24 font-bold py-2 px-4 rounded mt-2"
           onClick={clearAll}
         >
           Clear
@@ -83,7 +83,7 @@ const TextGeneration = () => {
           ) : (
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-white w-24 font-bold py-2 px-4 rounded"
             >
               Submit
             </button>

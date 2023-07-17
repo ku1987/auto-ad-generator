@@ -160,7 +160,7 @@ const ImageGeneration = () => {
               className="bg-slate-600 p-2 ml-2 rounded"
               id="image-batch-size"
               min={1}
-              max={10}
+              max={4}
               onChange={handleInputChange}
             ></input>
           </p>

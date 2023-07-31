@@ -2,10 +2,14 @@
 
 Ad generator using Next.js, Open AI API, StableDiffusion API.
 
-### Dev
+## Dev
 
-- npm run dev
+```sh
+$ npm run dev
+```
 
-### Build
+## Build
 
-- npm run build
+```sh
+$ npm run build
+```

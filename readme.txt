@@ -1,5 +1,7 @@
-AI Ad Generator
+AI Ad Generator with Next.js, Open AI API, StableDiffusion API.
 
-1. 解凍したフォルダの中から、index.html をブラウザで開いてください。
-2. 説明事項を読んでから、タブで使いたい機能をクリックしてください。
-3. コードに API キーが埋め込まれているため、外部に公開しないようにしてください。
+### Dev
+- npm run dev
+
+### Build
+- npm run build
